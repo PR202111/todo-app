@@ -23,9 +23,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    const token = localStorage.getItem('access_token')
+    if (!token) {
+      setLoading(false)
+      return
+    }
+
     authApi.me()
       .then(r => setUser(r.data))
-      .catch(() => setUser(null))
+      .catch(() => {
+        localStorage.removeItem('access_token')
+        setUser(null)
+      })
       .finally(() => setLoading(false))
   }, [])
 
