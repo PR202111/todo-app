@@ -13,5 +13,11 @@ build/
 *.log
 .DS_Store
 
-# DB backups
+# DB backups & WAL
 *.bak*
+*.db-wal
+*.db-shm
+
+# Environment & local secrets
+.env
+.env.local

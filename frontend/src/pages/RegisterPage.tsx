@@ -77,7 +77,12 @@ export default function RegisterPage() {
                   className={`w-full px-3 py-2 pr-10 rounded-lg border text-sm bg-white dark:bg-dark-card text-gray-900 dark:text-dark-text border-gray-300 dark:border-dark-border placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.password ? 'border-red-400' : ''}`}
                   {...register('password')}
                 />
-                <button type="button" onClick={() => setShowPw(s => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <button
+                  type="button"
+                  onClick={() => setShowPw(s => !s)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 min-h-[36px] min-w-[36px] flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-dark-text"
+                  aria-label={showPw ? "Hide password" : "Show password"}
+                >
                   {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>

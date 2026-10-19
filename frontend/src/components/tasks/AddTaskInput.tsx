@@ -85,16 +85,19 @@ export default function AddTaskInput({ onAdd, categories }: AddTaskInputProps) {
                     {Object.entries(PRIORITY_CONFIG).map(([key, cfg]) => (
                       <button
                         key={key}
+                        type="button"
                         onClick={() => setPriority(key as Task['priority'])}
-                        className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs transition-all ${
+                        className={`flex items-center gap-1 px-2 py-1 min-h-[32px] rounded-md text-xs transition-all ${
                           priority === key
                             ? 'bg-white dark:bg-dark-card shadow-xs font-semibold'
                             : 'opacity-70 hover:opacity-100'
                         }`}
                         style={{ color: cfg.color }}
+                        title={`Priority: ${cfg.label}`}
+                        aria-label={`Priority ${cfg.label}`}
                       >
                         <span className="w-2 h-2 rounded-full" style={{ backgroundColor: cfg.color }} />
-                        <span className="hidden xs:inline">{cfg.label}</span>
+                        <span className="hidden sm:inline">{cfg.label}</span>
                       </button>
                     ))}
                   </div>
@@ -107,7 +110,7 @@ export default function AddTaskInput({ onAdd, categories }: AddTaskInputProps) {
                     <select
                       value={categoryId || ''}
                       onChange={e => setCategoryId(e.target.value ? Number(e.target.value) : undefined)}
-                      className="text-xs px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-card text-gray-700 dark:text-dark-text"
+                      className="text-xs px-2.5 py-1.5 min-h-[32px] rounded-lg border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-card text-gray-700 dark:text-dark-text"
                     >
                       <option value="">No category</option>
                       {categories.map(c => (
@@ -120,15 +123,17 @@ export default function AddTaskInput({ onAdd, categories }: AddTaskInputProps) {
                 {/* Submit / Cancel buttons */}
                 <div className="flex items-center justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100 dark:border-dark-border">
                   <button
+                    type="button"
                     onClick={() => setFocused(false)}
-                    className="text-xs text-gray-400 hover:text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-border font-medium"
+                    className="text-xs text-gray-400 hover:text-gray-600 px-3 py-1.5 min-h-[36px] flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-dark-border font-medium"
                   >
                     Cancel
                   </button>
                   <button
+                    type="button"
                     onClick={submit}
                     disabled={!title.trim() || loading}
-                    className="text-xs bg-indigo-600 text-white px-4 py-1.5 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors font-medium shadow-xs"
+                    className="text-xs bg-indigo-600 text-white px-4 py-1.5 min-h-[36px] flex items-center justify-center rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors font-medium shadow-xs"
                   >
                     {loading ? 'Adding...' : 'Add task'}
                   </button>

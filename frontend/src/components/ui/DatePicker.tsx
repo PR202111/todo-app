@@ -18,22 +18,30 @@ export default function DatePicker({ value, onChange }: DatePickerProps) {
     function handleClick(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
     }
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape' && open) setOpen(false)
+    }
     document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [])
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('mousedown', handleClick)
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [open])
 
   return (
     <div ref={ref} className="relative">
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-dark-muted hover:text-indigo-500 transition-colors px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-dark-border"
+        aria-label={selected ? `Due date: ${format(selected, 'MMM d')}` : 'Set due date'}
+        className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-dark-muted hover:text-indigo-500 transition-colors px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-dark-border min-h-[32px]"
       >
         <CalendarIcon className="w-3.5 h-3.5" />
         {selected ? format(selected, 'MMM d') : 'Due date'}
       </button>
       {open && (
-        <div className="absolute z-50 mt-1 bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-xl shadow-xl p-2">
+        <div className="absolute z-50 mt-1 left-0 max-w-[calc(100vw-2rem)] bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-xl shadow-xl p-2 overflow-x-auto">
           <DayPicker
             mode="single"
             selected={selected}
@@ -43,7 +51,11 @@ export default function DatePicker({ value, onChange }: DatePickerProps) {
             }}
             footer={
               selected ? (
-                <button className="text-xs text-red-400 hover:text-red-500 mt-1" onClick={() => { onChange(undefined); setOpen(false) }}>
+                <button
+                  type="button"
+                  className="text-xs text-red-500 hover:text-red-600 dark:text-red-400 mt-2 px-2.5 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 min-h-[36px] font-medium transition-colors"
+                  onClick={() => { onChange(undefined); setOpen(false) }}
+                >
                   Clear date
                 </button>
               ) : null

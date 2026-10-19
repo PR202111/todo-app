@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -6,7 +7,7 @@ from jose import JWTError, jwt
 
 from schemas import TokenData
 
-SECRET_KEY = "supersecretkey_change_in_production_please"
+SECRET_KEY = os.environ.get("SECRET_KEY", "supersecretkey_change_in_production_please")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 10080  # 7 days
 

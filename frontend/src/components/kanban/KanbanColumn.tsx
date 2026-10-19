@@ -24,7 +24,7 @@ export default function KanbanColumn({ column, tasks, onToggle, onUpdate, onDele
   return (
     <div
       ref={setNodeRef}
-      className={`flex-shrink-0 w-[82vw] sm:w-72 flex flex-col rounded-2xl border transition-colors snap-center ${
+      className={`flex-shrink-0 w-[85vw] max-w-[320px] sm:w-72 flex flex-col rounded-2xl border transition-colors snap-center ${
         isOver
           ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-900/10'
           : 'border-gray-200/80 dark:border-dark-border bg-gray-50/70 dark:bg-dark-bg/60'

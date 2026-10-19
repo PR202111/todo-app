@@ -26,10 +26,10 @@ def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     token = None
-    if access_token:
-        token = access_token
-    elif authorization and authorization.startswith("Bearer "):
+    if authorization and authorization.startswith("Bearer "):
         token = authorization.split(" ")[1]
+    elif access_token:
+        token = access_token
 
     if not token:
         raise credentials_exception

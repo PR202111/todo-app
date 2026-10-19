@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { isToday, parseISO, isFuture } from 'date-fns'
 import { LayoutGrid, List, Menu, Search, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import CodingDashboard from '../components/coding/CodingDashboard'
 import KanbanBoard from '../components/kanban/KanbanBoard'
 import MobileNav from '../components/layout/MobileNav'
 import Sidebar from '../components/layout/Sidebar'
@@ -26,7 +27,7 @@ export default function DashboardPage() {
   const [priorityFilter, setPriorityFilter] = useState<string | undefined>()
   const searchRef = useRef<HTMLInputElement>(null)
 
-  const { tasks, loading, addTask, updateTask, deleteTask, reorderTasks } = useTasks(
+  const { tasks, loading, addTask, updateTask, deleteTask, reorderTasks, refetch } = useTasks(
     selectedView === 'completed' ? { completed: true }
     : selectedView === 'category' && selectedCategory ? { category_id: selectedCategory }
     : {}
@@ -69,13 +70,19 @@ export default function DashboardPage() {
     completed: tasks.filter(t => t.completed).length,
   }), [tasks])
 
+  const isCodingView = selectedView.startsWith('coding')
+
   const viewTitle = {
     all: 'All Tasks',
     today: 'Today',
     upcoming: 'Upcoming',
     completed: 'Completed',
+    'coding-overview': 'Coding Command Center',
+    'coding-contests': 'Competitive Contests',
+    'coding-streaks': 'Practice Streaks & Analytics',
+    'coding-goals': 'Personal Coding Goals',
     category: categories.find(c => c.id === selectedCategory)?.name || 'Category',
-  }[selectedView] || 'Tasks'
+  }[selectedView] || (isCodingView ? 'Coding Command Center' : 'Tasks')
 
   const handleToggle = (id: number, completed: boolean) => updateTask(id, { completed })
   const handleUpdate = (id: number, data: Partial<Task>) => updateTask(id, data)
@@ -97,83 +104,98 @@ export default function DashboardPage() {
 
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Unified Responsive Header */}
-        <header className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-gray-100 dark:border-dark-border bg-white dark:bg-dark-card flex-shrink-0">
-          <div className="flex items-center justify-between gap-3">
+        <header className="px-3.5 sm:px-6 py-3 sm:py-4 border-b border-gray-100 dark:border-dark-border bg-white dark:bg-dark-card flex-shrink-0">
+          <div className="flex items-center justify-between gap-2.5 sm:gap-3">
             {/* Left: Mobile Menu Trigger + Title */}
-            <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
               <button
                 onClick={() => setMobileDrawerOpen(true)}
-                className="md:hidden p-2 -ml-1 text-gray-600 dark:text-dark-text hover:bg-gray-100 dark:hover:bg-dark-border rounded-xl transition-colors"
+                className="md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center p-2 -ml-1 text-gray-600 dark:text-dark-text hover:bg-gray-100 dark:hover:bg-dark-border rounded-xl transition-colors"
                 aria-label="Open sidebar menu"
               >
                 <Menu className="w-5 h-5" />
               </button>
 
               <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-dark-text truncate">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <h1 className="text-base sm:text-xl font-bold text-gray-900 dark:text-dark-text truncate">
                     {viewTitle}
                   </h1>
-                  <span className="text-xs bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 font-semibold px-2 py-0.5 rounded-full flex-shrink-0">
-                    {remainingCount}
-                  </span>
+                  {!isCodingView && (
+                    <span className="text-xs bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 font-semibold px-2 py-0.5 rounded-full flex-shrink-0">
+                      {remainingCount}
+                    </span>
+                  )}
+                  {isCodingView && (
+                    <span className="text-xs bg-gradient-to-r from-blue-500/10 to-amber-500/10 border border-indigo-200 dark:border-indigo-900 text-indigo-600 dark:text-indigo-400 font-semibold px-2 sm:px-2.5 py-0.5 rounded-full flex-shrink-0">
+                      CF • LC
+                    </span>
+                  )}
                 </div>
                 <p className="hidden sm:block text-xs text-gray-400 dark:text-dark-muted mt-0.5">
-                  {remainingCount} tasks remaining
+                  {isCodingView
+                    ? 'LeetCode & Codeforces integration'
+                    : `${remainingCount} tasks remaining`}
                 </p>
               </div>
             </div>
 
             {/* Right: Search, View Switcher & Theme */}
-            <div className="flex items-center gap-2 sm:gap-3">
-              {/* Desktop Search Bar */}
-              <div className="relative hidden md:block">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
-                <input
-                  ref={searchRef}
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  placeholder="Search... (/ or ⌘K)"
-                  className="pl-9 pr-4 py-1.5 text-sm rounded-xl border border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-bg text-gray-800 dark:text-dark-text placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-48 transition-all focus:w-60"
-                />
-              </div>
+            <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+              {!isCodingView && (
+                <>
+                  {/* Desktop Search Bar */}
+                  <div className="relative hidden md:block">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                    <input
+                      ref={searchRef}
+                      value={search}
+                      onChange={e => setSearch(e.target.value)}
+                      placeholder="Search... (/ or ⌘K)"
+                      className="pl-9 pr-4 py-1.5 text-sm rounded-xl border border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-bg text-gray-800 dark:text-dark-text placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-48 transition-all focus:w-60"
+                    />
+                  </div>
 
-              {/* Mobile Search Toggle */}
-              <button
-                onClick={() => setMobileSearchOpen(s => !s)}
-                className={`md:hidden p-2 rounded-xl text-gray-500 dark:text-dark-muted hover:bg-gray-100 dark:hover:bg-dark-border transition-colors ${
-                  mobileSearchOpen || search ? 'text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30' : ''
-                }`}
-                aria-label="Toggle search"
-              >
-                <Search className="w-4 h-4" />
-              </button>
+                  {/* Mobile Search Toggle */}
+                  <button
+                    onClick={() => setMobileSearchOpen(s => !s)}
+                    className={`md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center p-2 rounded-xl text-gray-500 dark:text-dark-muted hover:bg-gray-100 dark:hover:bg-dark-border transition-colors ${
+                      mobileSearchOpen || search ? 'text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30' : ''
+                    }`}
+                    aria-label="Toggle search"
+                  >
+                    <Search className="w-4 h-4" />
+                  </button>
 
-              {/* View toggle (List vs Kanban) */}
-              <div className="flex bg-gray-100 dark:bg-dark-border rounded-xl p-1 gap-0.5">
-                <button
-                  onClick={() => setDisplayMode('list')}
-                  className={`p-1.5 rounded-lg transition-all ${
-                    displayMode === 'list'
-                      ? 'bg-white dark:bg-dark-card shadow-xs text-indigo-600 font-semibold'
-                      : 'text-gray-400 hover:text-gray-600'
-                  }`}
-                  title="List view"
-                >
-                  <List className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setDisplayMode('kanban')}
-                  className={`p-1.5 rounded-lg transition-all ${
-                    displayMode === 'kanban'
-                      ? 'bg-white dark:bg-dark-card shadow-xs text-indigo-600 font-semibold'
-                      : 'text-gray-400 hover:text-gray-600'
-                  }`}
-                  title="Kanban board"
-                >
-                  <LayoutGrid className="w-4 h-4" />
-                </button>
-              </div>
+                  {/* View toggle (List vs Kanban) */}
+                  <div className="flex bg-gray-100 dark:bg-dark-border rounded-xl p-1 gap-0.5">
+                    <button
+                      onClick={() => setDisplayMode('list')}
+                      className={`p-1.5 rounded-lg transition-all min-h-[36px] min-w-[36px] flex items-center justify-center ${
+                        displayMode === 'list'
+                          ? 'bg-white dark:bg-dark-card shadow-xs text-indigo-600 font-semibold'
+                          : 'text-gray-400 hover:text-gray-600'
+                      }`}
+                      title="List view"
+                      aria-label="Switch to list view"
+                    >
+                      <List className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setDisplayMode('kanban')}
+                      className={`p-1.5 rounded-lg transition-all min-h-[36px] min-w-[36px] flex items-center justify-center ${
+                        displayMode === 'kanban'
+                          ? 'bg-white dark:bg-dark-card shadow-xs text-indigo-600 font-semibold'
+                          : 'text-gray-400 hover:text-gray-600'
+                      }`}
+                      title="Kanban board"
+                      aria-label="Switch to kanban view"
+                    >
+                      <LayoutGrid className="w-4 h-4" />
+                    </button>
+                  </div>
+                </>
+              )}
 
               <ThemeToggle />
             </div>
@@ -200,7 +222,8 @@ export default function DashboardPage() {
                   {search && (
                     <button
                       onClick={() => setSearch('')}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 p-1"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 p-1.5 min-h-[36px] min-w-[36px] flex items-center justify-center"
+                      aria-label="Clear search text"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -212,8 +235,24 @@ export default function DashboardPage() {
         </header>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 pb-24 sm:pb-8">
-          {displayMode === 'list' ? (
+        <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-28 sm:pb-8">
+          {isCodingView ? (
+            <motion.div
+              key="coding"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="max-w-5xl mx-auto"
+            >
+              <CodingDashboard
+                initialSubTab={
+                  selectedView === 'coding' || selectedView === 'coding-overview'
+                    ? 'overview'
+                    : (selectedView.replace('coding-', '') as any)
+                }
+                onTaskCreated={refetch}
+              />
+            </motion.div>
+          ) : displayMode === 'list' ? (
             <motion.div
               key="list"
               initial={{ opacity: 0 }}
@@ -225,12 +264,12 @@ export default function DashboardPage() {
               )}
 
               {/* Priority filter chips */}
-              <div className="flex gap-2 mb-4 overflow-x-auto pb-1 flex-nowrap sm:flex-wrap items-center">
+              <div className="flex gap-2 mb-4 overflow-x-auto pb-1 flex-nowrap sm:flex-wrap items-center no-scrollbar overscroll-x-contain">
                 {['all', 'urgent', 'high', 'medium', 'low'].map(p => (
                   <button
                     key={p}
                     onClick={() => setPriorityFilter(p === 'all' ? undefined : p)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap flex-shrink-0 ${
+                    className={`px-3 py-1.5 min-h-[36px] rounded-full text-xs font-medium transition-all whitespace-nowrap flex-shrink-0 flex items-center ${
                       (p === 'all' && !priorityFilter) || priorityFilter === p
                         ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 font-semibold shadow-2xs'
                         : 'bg-gray-100 dark:bg-dark-border text-gray-500 dark:text-dark-muted hover:bg-gray-200'

@@ -103,7 +103,7 @@ export default function TaskCard({ task, onToggle, onUpdate, onDelete, onEdit }:
       >
         <div className="flex items-start gap-2">
           <span
-            className={`text-sm leading-5 text-gray-800 dark:text-dark-text flex-1 task-complete-text ${
+            className={`text-sm leading-5 text-gray-800 dark:text-dark-text flex-1 task-complete-text break-words ${
               task.completed ? 'line-through text-gray-400 dark:text-dark-muted done' : ''
             }`}
           >
@@ -113,7 +113,7 @@ export default function TaskCard({ task, onToggle, onUpdate, onDelete, onEdit }:
         </div>
 
         {task.description && (
-          <p className="text-xs text-gray-400 dark:text-dark-muted mt-0.5 line-clamp-2">{task.description}</p>
+          <p className="text-xs text-gray-400 dark:text-dark-muted mt-0.5 line-clamp-2 break-words">{task.description}</p>
         )}
 
         <div className="flex items-center gap-2 mt-1.5 flex-wrap" onClick={e => e.stopPropagation()}>
@@ -136,15 +136,17 @@ export default function TaskCard({ task, onToggle, onUpdate, onDelete, onEdit }:
       <div className="flex items-center gap-0.5 flex-shrink-0 opacity-80 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
         <button
           onClick={() => onEdit(task)}
-          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-border text-gray-400 hover:text-indigo-600 transition-colors"
+          className="min-h-[36px] min-w-[36px] flex items-center justify-center p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-border text-gray-400 hover:text-indigo-600 transition-colors"
           title="Edit task"
+          aria-label={`Edit task ${task.title}`}
         >
           <Pencil className="w-3.5 h-3.5" />
         </button>
         <button
           onClick={() => onDelete(task.id)}
-          className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-400 hover:text-red-500 transition-colors"
+          className="min-h-[36px] min-w-[36px] flex items-center justify-center p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-400 hover:text-red-500 transition-colors"
           title="Delete task"
+          aria-label={`Delete task ${task.title}`}
         >
           <Trash2 className="w-3.5 h-3.5" />
         </button>

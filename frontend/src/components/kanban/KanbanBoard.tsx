@@ -45,7 +45,7 @@ export default function KanbanBoard({ tasks, categories, onToggle, onUpdate, onD
       onDragStart={e => setActiveTask(tasks.find(t => t.id === Number(e.active.id)) || null)}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex gap-3.5 sm:gap-4 overflow-x-auto pb-6 h-full snap-x snap-mandatory scroll-px-4 px-1">
+      <div className="flex gap-3.5 sm:gap-4 overflow-x-auto pb-6 h-full snap-x snap-mandatory scroll-px-4 px-1 overscroll-x-contain touch-pan-x">
         {columns.map(col => (
           <KanbanColumn
             key={String(col.id)}

@@ -8,12 +8,27 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 body {
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Scrollbar styling */
@@ -34,10 +49,15 @@ body {
 
 /* DayPicker custom styles */
 .rdp {
-  --rdp-cell-size: 36px;
+  --rdp-cell-size: 34px;
   --rdp-accent-color: #6366f1;
   --rdp-background-color: #e0e7ff;
   margin: 0;
+}
+@media (max-width: 360px) {
+  .rdp {
+    --rdp-cell-size: 28px;
+  }
 }
 .dark .rdp {
   --rdp-background-color: #312e81;
@@ -60,3 +80,29 @@ body {
 .task-complete-text.done::after {
   width: 100%;
 }
+
+/* Safe area support for iOS / modern mobile */
+.pb-safe {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+/* Hide scrollbar utility for clean responsive horizontal chips */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Tap highlight reset for smooth touch UX */
+button, a, input, select, textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Global focus-visible indicator for accessibility */
+:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
