@@ -1,0 +1,54 @@
+# Render Blueprint for TodoFlow 2.0
+# Deploy via: Render Dashboard -> "New" -> "Blueprint" -> Connect your repository
+services:
+  # 1. FastAPI Backend Web Service
+  - type: web
+    name: todoflow-backend
+    runtime: python
+    region: oregon
+    plan: free # Note: Free tier has ephemeral disk; upgrade to Starter ($7/mo) to attach persistent disk
+    branch: main
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: SECRET_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: https://todoflow-frontend.onrender.com,http://localhost:5173,http://localhost:8080
+      - key: DATABASE_URL
+        value: sqlite:////app/data/todoapp.db
+
+  # 2. React PWA Frontend Static Site
+  - type: web
+    name: todoflow-frontend
+    runtime: static
+    region: oregon
+    plan: free
+    branch: main
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    headers:
+      - path: /sw.js
+        name: Cache-Control
+        value: no-cache, no-store, must-revalidate
+      - path: /manifest.json
+        name: Cache-Control
+        value: no-cache, no-store, must-revalidate
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache, no-store, must-revalidate
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://todoflow-backend.onrender.com

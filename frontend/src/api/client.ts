@@ -1,7 +1,9 @@
 import axios from 'axios'
 
+const API_URL = import.meta.env.VITE_API_URL || ''
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: `${API_URL}/api`,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 })
@@ -266,6 +268,6 @@ export const achievementsApi = {
 }
 
 export const exportsApi = {
-  getJsonExportUrl: () => '/api/coding/export/json',
-  getProblemsCsvUrl: () => '/api/coding/export/problems/csv',
+  getJsonExportUrl: () => `${API_URL}/api/coding/export/json`,
+  getProblemsCsvUrl: () => `${API_URL}/api/coding/export/problems/csv`,
 }
