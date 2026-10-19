@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #374151;
+}
+
+/* DayPicker custom styles */
+.rdp {
+  --rdp-cell-size: 36px;
+  --rdp-accent-color: #6366f1;
+  --rdp-background-color: #e0e7ff;
+  margin: 0;
+}
+.dark .rdp {
+  --rdp-background-color: #312e81;
+}
+
+/* Animated strikethrough */
+.task-complete-text {
+  position: relative;
+}
+.task-complete-text::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 1.5px;
+  background: currentColor;
+  width: 0;
+  transition: width 0.3s ease;
+}
+.task-complete-text.done::after {
+  width: 100%;
+}

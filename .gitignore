@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+venv/
+__pycache__/
+*.pyc
+
+# Builds
+dist/
+build/
+*.egg-info/
+
+# Logs & temp
+*.log
+.DS_Store
+
+# DB backups
+*.bak*
