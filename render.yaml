@@ -26,8 +26,6 @@ services:
   - type: web
     name: todoflow-frontend
     runtime: static
-    region: oregon
-    plan: free
     branch: main
     rootDir: frontend
     buildCommand: npm install && npm run build
